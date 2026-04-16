@@ -1,0 +1,484 @@
+{
+  "ingredients": {
+    "carbs": [
+      { "id": "c01", "name": "紫薯", "category": "carbs", "tags": ["low-gi", "easy-digest"] },
+      { "id": "c02", "name": "玉米", "category": "carbs", "tags": ["low-gi", "fiber"] },
+      { "id": "c03", "name": "藜麦", "category": "carbs", "tags": ["high-protein", "low-gi"] },
+      { "id": "c04", "name": "米饭", "category": "carbs", "tags": ["easy-digest", "high-gi"] },
+      { "id": "c05", "name": "麦片", "category": "carbs", "tags": ["low-gi", "easy-digest"] },
+      { "id": "c06", "name": "馒头", "category": "carbs", "tags": ["easy-digest", "high-gi"] },
+      { "id": "c07", "name": "土豆", "category": "carbs", "tags": ["easy-digest", "medium-gi"] }
+    ],
+    "protein": [
+      { "id": "p01", "name": "鸡胸肉", "category": "protein", "tags": ["lean", "high-protein"] },
+      { "id": "p02", "name": "白切鸡", "category": "protein", "tags": ["medium-fat", "high-protein"] },
+      { "id": "p03", "name": "牛肉", "category": "protein", "tags": ["high-protein", "iron"] },
+      { "id": "p04", "name": "猪肉", "category": "protein", "tags": ["medium-fat", "high-protein"] },
+      { "id": "p05", "name": "鲈鱼", "category": "protein", "tags": ["lean", "high-protein", "omega3"] },
+      { "id": "p06", "name": "三文鱼", "category": "protein", "tags": ["high-fat", "omega3", "high-protein"] },
+      { "id": "p07", "name": "鳕鱼", "category": "protein", "tags": ["lean", "high-protein"] },
+      { "id": "p08", "name": "虾", "category": "protein", "tags": ["lean", "high-protein", "zinc"] },
+      { "id": "p09", "name": "分离乳清蛋白粉", "category": "protein", "tags": ["fast-absorb", "high-protein"] }
+    ],
+    "micronutrients": [
+      { "id": "m01", "name": "生菜", "category": "micronutrients", "tags": ["low-fiber", "vitamin-k"] },
+      { "id": "m02", "name": "菠菜", "category": "micronutrients", "tags": ["iron", "vitamin-a"] },
+      { "id": "m03", "name": "油麦菜", "category": "micronutrients", "tags": ["low-fiber", "vitamin-c"] },
+      { "id": "m04", "name": "菜心", "category": "micronutrients", "tags": ["low-fiber", "calcium"] },
+      { "id": "m05", "name": "黄瓜", "category": "micronutrients", "tags": ["hydration", "low-fiber"] },
+      { "id": "m06", "name": "胡萝卜", "category": "micronutrients", "tags": ["vitamin-a", "fiber"] },
+      { "id": "m07", "name": "蓝莓", "category": "micronutrients", "tags": ["antioxidant", "vitamin-c"] }
+    ],
+    "snack": [
+      { "id": "s01", "name": "黑巧", "category": "snack", "tags": ["antioxidant", "magnesium"] }
+    ]
+  },
+
+  "recipes": {
+    "pre_workout": [
+      {
+        "id": "pre01",
+        "name": "紫薯蒸蛋",
+        "mealTag": "pre_workout",
+        "suitableMeals": ["breakfast", "lunch"],
+        "ingredientIds": ["c01", "p01", "m05"],
+        "portions": { "c01": "200g", "p01": "1个鸡蛋(非鸡胸)", "m05": "半根" },
+        "nutrition": { "calories": 320, "carbs": 50, "protein": 15, "fat": 5, "fiber": 3 },
+        "steps": [
+          "紫薯去皮切片，放入蒸锅大火蒸15分钟至软烂",
+          "鸡蛋打散加少许盐、温水（1:1.5），过滤气泡",
+          "紫薯铺底碗中，倒入蛋液，盖保鲜膜扎孔",
+          "中火蒸12分钟，焖2分钟出锅，搭配黄瓜条"
+        ],
+        "tips": "练前2h食用最佳。紫薯低GI缓释能量，蛋液易消化不胀气，适合高强度训练前补给。"
+      },
+      {
+        "id": "pre02",
+        "name": "麦片香蕉奶昔",
+        "mealTag": "pre_workout",
+        "suitableMeals": ["breakfast"],
+        "ingredientIds": ["c05", "p09"],
+        "portions": { "c05": "40g", "p09": "1勺(30g)" },
+        "nutrition": { "calories": 350, "carbs": 55, "protein": 25, "fat": 4, "fiber": 3 },
+        "steps": [
+          "即食麦片40g倒入杯中",
+          "加入1根香蕉（切段）、1勺蛋白粉",
+          "倒入250ml牛奶或水，搅拌机打30秒",
+          "倒出即饮，可撒少量肉桂粉提味"
+        ],
+        "tips": "训练前1.5-2h饮用。液态易吸收，碳水蛋白比约2:1，快速供能不给肠胃增加负担。"
+      },
+      {
+        "id": "pre03",
+        "name": "土豆泥配馒头",
+        "mealTag": "pre_workout",
+        "suitableMeals": ["breakfast", "lunch"],
+        "ingredientIds": ["c07", "c06", "m05"],
+        "portions": { "c07": "150g", "c06": "1个(50g)", "m05": "1根" },
+        "nutrition": { "calories": 310, "carbs": 58, "protein": 8, "fat": 3, "fiber": 3 },
+        "steps": [
+          "土豆去皮切块，沸水煮15分钟至烂",
+          "捞出压成泥，加少许盐和一小勺黄油拌匀",
+          "馒头切片微波30秒加热",
+          "土豆泥搭配馒头片食用，配黄瓜条清口"
+        ],
+        "tips": "极简练前餐。土豆+馒头双重碳水蓄能，低脂低纤维不给消化系统压力。"
+      },
+      {
+        "id": "pre04",
+        "name": "藜麦饭团",
+        "mealTag": "pre_workout",
+        "suitableMeals": ["lunch"],
+        "ingredientIds": ["c03", "c04", "m01"],
+        "portions": { "c03": "50g", "c04": "100g", "m01": "2片" },
+        "nutrition": { "calories": 340, "carbs": 60, "protein": 12, "fat": 4, "fiber": 4 },
+        "steps": [
+          "藜麦提前浸泡20分钟，与米饭一起煮熟（比例1:2）",
+          "煮好后趁热加少许寿司醋拌匀",
+          "取适量饭铺在保鲜膜上，中间放少量肉松",
+          "裹成三角饭团，配生菜叶食用"
+        ],
+        "tips": "练前2-3h食用。藜麦是完全蛋白碳水，氨基酸谱全面，比纯米饭营养密度更高。"
+      },
+      {
+        "id": "pre05",
+        "name": "玉米鸡丝粥",
+        "mealTag": "pre_workout",
+        "suitableMeals": ["breakfast", "lunch"],
+        "ingredientIds": ["c02", "c04", "p01"],
+        "portions": { "c02": "半根", "c04": "50g(干米)", "p01": "50g" },
+        "nutrition": { "calories": 300, "carbs": 48, "protein": 18, "fat": 3, "fiber": 2 },
+        "steps": [
+          "大米淘洗后加水大火煮开转小火熬30分钟",
+          "鸡胸肉煮熟撕成丝，玉米粒剥好",
+          "粥将好时加入玉米粒和鸡丝，再煮5分钟",
+          "加盐、白胡椒粉调味，撒葱花出锅"
+        ],
+        "tips": "粥类最适合练前，胃排空快。玉米提供缓释碳水，少量鸡丝补充蛋白不增胃负担。"
+      },
+      {
+        "id": "pre06",
+        "name": "米饭配清蒸菜心",
+        "mealTag": "pre_workout",
+        "suitableMeals": ["lunch"],
+        "ingredientIds": ["c04", "m04", "m05"],
+        "portions": { "c04": "150g", "m04": "100g", "m05": "半根" },
+        "nutrition": { "calories": 280, "carbs": 52, "protein": 7, "fat": 2, "fiber": 3 },
+        "steps": [
+          "米饭正常蒸熟",
+          "菜心洗净焯水30秒捞出",
+          "蒜末热油淋在菜心上，加蚝油一勺",
+          "黄瓜切条放旁边，搭配食用"
+        ],
+        "tips": "极简清淡练前餐。菜心低纤维好消化，白米饭快速补充糖原。练前2h吃正好。"
+      },
+      {
+        "id": "pre07",
+        "name": "紫薯麦片碗",
+        "mealTag": "pre_workout",
+        "suitableMeals": ["breakfast"],
+        "ingredientIds": ["c01", "c05", "m07"],
+        "portions": { "c01": "150g", "c05": "30g", "m07": "一小把" },
+        "nutrition": { "calories": 290, "carbs": 55, "protein": 6, "fat": 3, "fiber": 4 },
+        "steps": [
+          "紫薯蒸熟压成泥",
+          "麦片用热牛奶泡软",
+          "碗中铺麦片底，上层铺紫薯泥",
+          "顶部撒蓝莓装饰，可加少许蜂蜜"
+        ],
+        "tips": "颜值与功能兼备的练前早餐。蓝莓抗氧化，紫薯+麦片双碳水持续供能。"
+      },
+      {
+        "id": "pre08",
+        "name": "馒头夹蛋",
+        "mealTag": "pre_workout",
+        "suitableMeals": ["breakfast"],
+        "ingredientIds": ["c06", "m01"],
+        "portions": { "c06": "1个", "m01": "2片" },
+        "nutrition": { "calories": 270, "carbs": 40, "protein": 12, "fat": 6, "fiber": 1 },
+        "steps": [
+          "馒头对半切开",
+          "平底锅煎一个鸡蛋（少油），撒盐和黑胡椒",
+          "夹入馒头中，加生菜叶",
+          "可配一杯温豆浆"
+        ],
+        "tips": "最速练前餐，5分钟搞定。馒头高GI快速升糖，配蛋补少量蛋白，练前1.5h吃最佳。"
+      }
+    ],
+
+    "post_workout": [
+      {
+        "id": "post01",
+        "name": "香煎鸡胸肉配藜麦沙拉",
+        "mealTag": "post_workout",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p01", "c03", "m02", "m05"],
+        "portions": { "p01": "150g", "c03": "80g", "m02": "一把", "m05": "半根" },
+        "nutrition": { "calories": 450, "carbs": 40, "protein": 42, "fat": 10, "fiber": 5 },
+        "steps": [
+          "鸡胸肉用盐、黑胡椒、少量橄榄油腌制15分钟",
+          "平底锅中火煎至两面金黄（每面4分钟），切片",
+          "藜麦淘洗后煮15分钟，沥水放凉",
+          "菠菜洗净、黄瓜切丁，与藜麦拌匀",
+          "鸡胸肉码在沙拉上，淋柠檬汁和少许橄榄油"
+        ],
+        "tips": "练后30分钟内食用。鸡胸肉快速补充优质蛋白，藜麦恢复糖原，菠菜补铁对抗训练氧化应激。"
+      },
+      {
+        "id": "post02",
+        "name": "三文鱼牛油果拌饭",
+        "mealTag": "post_workout",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p06", "c04", "m05", "m01"],
+        "portions": { "p06": "120g", "c04": "150g", "m05": "半根", "m01": "适量" },
+        "nutrition": { "calories": 520, "carbs": 45, "protein": 35, "fat": 18, "fiber": 4 },
+        "steps": [
+          "三文鱼切厚片，用酱油、味淋腌5分钟",
+          "米饭蒸好盛入碗中",
+          "牛油果切片，黄瓜切薄片",
+          "三文鱼、牛油果、黄瓜码在米饭上",
+          "淋芥末酱油，撒白芝麻和海苔碎"
+        ],
+        "tips": "练后恢复神器。三文鱼Omega-3抗炎修复肌肉，牛油果补充优质脂肪促进脂溶性维生素吸收。"
+      },
+      {
+        "id": "post03",
+        "name": "黑椒牛肉配紫薯",
+        "mealTag": "post_workout",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p03", "c01", "m02", "m06"],
+        "portions": { "p03": "150g", "c01": "150g", "m02": "一把", "m06": "半根" },
+        "nutrition": { "calories": 480, "carbs": 42, "protein": 40, "fat": 14, "fiber": 5 },
+        "steps": [
+          "牛肉切薄片，加生抽、淀粉、黑胡椒腌制20分钟",
+          "紫薯切块蒸熟备用",
+          "热锅宽油快炒牛肉至变色，盛出",
+          "锅中放胡萝卜丝、菠菜翻炒，加牛肉回锅",
+          "加蚝油、少许水炒匀，配紫薯食用"
+        ],
+        "tips": "练后黄金餐。牛肉肌酸+铁质双重恢复，紫薯比白米饭GI低，恢复糖原更平稳。"
+      },
+      {
+        "id": "post04",
+        "name": "清蒸鲈鱼配米饭",
+        "mealTag": "post_workout",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p05", "c04", "m04", "m01"],
+        "portions": { "p05": "1条(约300g)", "c04": "150g", "m04": "100g", "m01": "适量" },
+        "nutrition": { "calories": 430, "carbs": 42, "protein": 38, "fat": 8, "fiber": 3 },
+        "steps": [
+          "鲈鱼处理干净，鱼身划刀，塞入姜片和葱段",
+          "大火蒸8分钟，关火焖2分钟",
+          "倒掉蒸鱼水，淋蒸鱼豉油",
+          "热油浇在鱼身葱丝上，配米饭和烫菜心"
+        ],
+        "tips": "低脂高蛋白首选。鲈鱼DHA促神经恢复，蒸制保留最多营养，练后1h内吃完。"
+      },
+      {
+        "id": "post05",
+        "name": "蒜蓉虾仁炒菠菜配米饭",
+        "mealTag": "post_workout",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p08", "c04", "m02"],
+        "portions": { "p08": "200g", "c04": "150g", "m02": "一大把" },
+        "nutrition": { "calories": 420, "carbs": 43, "protein": 38, "fat": 7, "fiber": 4 },
+        "steps": [
+          "虾仁去虾线，加料酒、盐腌5分钟",
+          "菠菜焯水30秒捞出沥干",
+          "热锅少油爆香蒜末，下虾仁翻炒至变色",
+          "加入菠菜快炒，加盐和少许生抽调味",
+          "配米饭食用"
+        ],
+        "tips": "虾仁锌含量高，促进睾酮分泌利于肌肉合成。菠菜铁+叶酸助血红蛋白恢复。"
+      },
+      {
+        "id": "post06",
+        "name": "鳕鱼蒸蛋配玉米",
+        "mealTag": "post_workout",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p07", "c02", "m03"],
+        "portions": { "p07": "150g", "c02": "1根", "m03": "100g" },
+        "nutrition": { "calories": 400, "carbs": 38, "protein": 36, "fat": 9, "fiber": 3 },
+        "steps": [
+          "鳕鱼解冻切块，用盐和柠檬汁腌10分钟",
+          "鸡蛋2个打散加温水，过滤倒入蒸碗",
+          "鳕鱼块放在蛋液上，中火蒸15分钟",
+          "玉米切段蒸熟，油麦菜焯水",
+          "蒸蛋出锅淋生抽和香油，配玉米和青菜"
+        ],
+        "tips": "鳕鱼是最易消化的高蛋白鱼类，适合练后胃口不好时食用。蛋液增加蛋白摄入。"
+      },
+      {
+        "id": "post07",
+        "name": "蛋白粉香蕉奶昔+蓝莓",
+        "mealTag": "post_workout",
+        "suitableMeals": ["breakfast", "lunch", "dinner"],
+        "ingredientIds": ["p09", "m07", "c05"],
+        "portions": { "p09": "2勺(60g)", "m07": "一把", "c05": "30g" },
+        "nutrition": { "calories": 380, "carbs": 40, "protein": 40, "fat": 4, "fiber": 3 },
+        "steps": [
+          "搅拌杯中加2勺蛋白粉、1根香蕉",
+          "加一把蓝莓和少量麦片增加口感",
+          "倒入300ml牛奶或水，搅拌均匀",
+          "倒出即饮，冰镇口感更佳"
+        ],
+        "tips": "练后即时恢复首选！液态蛋白吸收速度最快，30分钟内饮用窗口期效果最大化。蓝莓抗氧化对冲运动自由基。"
+      },
+      {
+        "id": "post08",
+        "name": "白切鸡配油麦菜拌饭",
+        "mealTag": "post_workout",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p02", "c04", "m03"],
+        "portions": { "p02": "半只腿(约150g)", "c04": "150g", "m03": "100g" },
+        "nutrition": { "calories": 460, "carbs": 42, "protein": 35, "fat": 15, "fiber": 2 },
+        "steps": [
+          "鸡腿冷水下锅，加姜葱煮沸后转小火20分钟",
+          "捞出过冰水10分钟，皮脆肉嫩",
+          "切块摆盘，蘸料：姜葱+盐+热油淋制",
+          "油麦菜蒜蓉炒熟，配白米饭"
+        ],
+        "tips": "广式经典练后餐。鸡肉蛋白质利用率高达95%，过冰水保持口感，适合练后食欲旺盛时大口吃。"
+      },
+      {
+        "id": "post09",
+        "name": "牛肉生菜卷",
+        "mealTag": "post_workout",
+        "suitableMeals": ["dinner"],
+        "ingredientIds": ["p03", "m01", "m06", "c04"],
+        "portions": { "p03": "120g", "m01": "4-5片", "m06": "半根", "c04": "100g" },
+        "nutrition": { "calories": 400, "carbs": 35, "protein": 35, "fat": 12, "fiber": 3 },
+        "steps": [
+          "牛肉切薄片，用蚝油、生抽、黑胡椒腌15分钟",
+          "胡萝卜切细丝，生菜叶洗净沥干",
+          "热锅快炒牛肉片至刚熟",
+          "生菜叶铺平，放米饭、牛肉和胡萝卜丝",
+          "卷起食用，可蘸甜辣酱"
+        ],
+        "tips": "手卷形式趣味十足又好吃。胡萝卜β-胡萝卜素+牛肉铁，搭配高蛋白快速修复。"
+      }
+    ],
+
+    "rest_day": [
+      {
+        "id": "rest01",
+        "name": "藜麦菠菜虾仁沙拉",
+        "mealTag": "rest_day",
+        "suitableMeals": ["lunch"],
+        "ingredientIds": ["c03", "p08", "m02", "m05", "m07"],
+        "portions": { "c03": "60g", "p08": "100g", "m02": "一把", "m05": "半根", "m07": "一小把" },
+        "nutrition": { "calories": 350, "carbs": 35, "protein": 25, "fat": 10, "fiber": 6 },
+        "steps": [
+          "藜麦煮熟放凉",
+          "虾仁焯水至熟，用冰水过凉",
+          "菠菜焯水切段，黄瓜切丁",
+          "所有食材混合，淋橄榄油+柠檬汁+盐",
+          "顶部撒蓝莓点缀"
+        ],
+        "tips": "休息日均衡轻食。热量适中不过量，蛋白碳水脂肪黄金比例1:1.4:0.4，维持肌肉不囤脂。"
+      },
+      {
+        "id": "rest02",
+        "name": "番茄牛肉炖土豆",
+        "mealTag": "rest_day",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p03", "c07", "m06"],
+        "portions": { "p03": "120g", "c07": "150g", "m06": "1根" },
+        "nutrition": { "calories": 420, "carbs": 40, "protein": 30, "fat": 14, "fiber": 5 },
+        "steps": [
+          "牛肉切块焯水去血沫",
+          "土豆、胡萝卜切滚刀块",
+          "锅中少油炒香洋葱，加番茄酱翻炒",
+          "放入牛肉和蔬菜，加水没过，炖40分钟",
+          "加盐调味，撒黑胡椒出锅"
+        ],
+        "tips": "休息日炖菜首选。长时间炖煮蛋白质更好消化吸收，番茄红素+胡萝卜素双抗氧化。"
+      },
+      {
+        "id": "rest03",
+        "name": "鸡胸肉蔬菜卷饼",
+        "mealTag": "rest_day",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p01", "c06", "m01", "m06", "m05"],
+        "portions": { "p01": "100g", "c06": "1张薄饼", "m01": "2片", "m06": "少量", "m05": "少量" },
+        "nutrition": { "calories": 380, "carbs": 38, "protein": 30, "fat": 10, "fiber": 4 },
+        "steps": [
+          "鸡胸肉切条，用孜然、盐、辣椒粉腌制",
+          "平底锅煎至金黄",
+          "馒头皮或薄饼加热，铺生菜、鸡肉条、胡萝卜丝、黄瓜丝",
+          "淋少许甜辣酱或蛋黄酱",
+          "卷起切半食用"
+        ],
+        "tips": "休息日可以稍放松一点！卷饼形式营养全面又有趣，碳蛋脂均衡，不会因热量缺口影响恢复。"
+      },
+      {
+        "id": "rest04",
+        "name": "猪肉菠菜馄饨",
+        "mealTag": "rest_day",
+        "suitableMeals": ["breakfast", "lunch"],
+        "ingredientIds": ["p04", "m02", "m03"],
+        "portions": { "p04": "100g(馅)", "m02": "50g", "m03": "适量" },
+        "nutrition": { "calories": 400, "carbs": 42, "protein": 25, "fat": 14, "fiber": 3 },
+        "steps": [
+          "猪肉馅加盐、生抽、姜末、葱花拌匀",
+          "菠菜焯水切碎拌入肉馅",
+          "包馄饨（可以多包冷冻备用！）",
+          "煮沸水下馄饨，浮起后再煮2分钟",
+          "碗中放紫菜虾皮，倒入汤，配油麦菜"
+        ],
+        "tips": "休息日治愈系美食。可以一次多做冷冻，训练日也能速食。汤底紫菜虾皮补钙补碘。"
+      },
+      {
+        "id": "rest05",
+        "name": "三文鱼牛油果三明治",
+        "mealTag": "rest_day",
+        "suitableMeals": ["breakfast", "lunch"],
+        "ingredientIds": ["p06", "m01", "m05"],
+        "portions": { "p06": "80g", "m01": "2片", "m05": "少量" },
+        "nutrition": { "calories": 420, "carbs": 35, "protein": 25, "fat": 20, "fiber": 4 },
+        "steps": [
+          "全麦吐司烤至微脆",
+          "牛油果捣成泥铺在吐司上",
+          "烟熏三文鱼片铺上",
+          "加生菜、黄瓜薄片、挤柠檬汁",
+          "盖上另一片吐司，对角切开"
+        ],
+        "tips": "休息日高品质早午餐。Omega-3促进关节恢复，全麦碳水慢释放，饱腹感强不易饿。"
+      },
+      {
+        "id": "rest06",
+        "name": "蒜蓉鳕鱼配玉米沙拉",
+        "mealTag": "rest_day",
+        "suitableMeals": ["dinner"],
+        "ingredientIds": ["p07", "c02", "m04", "m05"],
+        "portions": { "p07": "150g", "c02": "半根", "m04": "100g", "m05": "半根" },
+        "nutrition": { "calories": 360, "carbs": 32, "protein": 35, "fat": 8, "fiber": 4 },
+        "steps": [
+          "鳕鱼块加盐和柠檬汁腌10分钟",
+          "平底锅少油，蒜末爆香后放入鳕鱼",
+          "中火每面煎3分钟至金黄",
+          "玉米粒、菜心焯水，黄瓜切丁混合",
+          "淋橄榄油和黑胡椒，配鳕鱼食用"
+        ],
+        "tips": "休息日晚餐宜清淡。鳕鱼低脂高蛋白完美晚餐选择，玉米沙拉增加饱腹感控制总热量。"
+      },
+      {
+        "id": "rest07",
+        "name": "紫薯燕麦粥",
+        "mealTag": "rest_day",
+        "suitableMeals": ["breakfast"],
+        "ingredientIds": ["c01", "c05", "m07"],
+        "portions": { "c01": "100g", "c05": "40g", "m07": "一把" },
+        "nutrition": { "calories": 300, "carbs": 55, "protein": 8, "fat": 4, "fiber": 6 },
+        "steps": [
+          "紫薯去皮切小块",
+          "锅中加水烧开，放入紫薯煮15分钟",
+          "加入燕麦片再煮5分钟至浓稠",
+          "盛出放至温热，顶部放蓝莓",
+          "可加少许蜂蜜调味"
+        ],
+        "tips": "休息日慢节奏早餐。高纤维促进肠道蠕动，排出训练期积累的代谢废物。"
+      },
+      {
+        "id": "rest08",
+        "name": "虾仁炒油麦菜配馒头",
+        "mealTag": "rest_day",
+        "suitableMeals": ["lunch", "dinner"],
+        "ingredientIds": ["p08", "m03", "c06"],
+        "portions": { "p08": "120g", "m03": "150g", "c06": "1个" },
+        "nutrition": { "calories": 340, "carbs": 38, "protein": 28, "fat": 7, "fiber": 3 },
+        "steps": [
+          "虾仁去虾线洗净",
+          "油麦菜切段",
+          "热锅少油爆蒜，下虾仁炒至变色",
+          "加入油麦菜大火翻炒，加盐出锅",
+          "配馒头食用"
+        ],
+        "tips": "简单均衡的休息日家常菜。虾仁优质蛋白+锌，油麦菜维C利于铁吸收，馒头补碳水。"
+      }
+    ]
+  },
+
+  "snackTrigger": {
+    "item": "s01",
+    "name": "黑巧克力加餐",
+    "triggerProbability": 0.25,
+    "portion": "20-30g（2-3小块）",
+    "tips": "黑巧（>70%可可）富含镁和多酚类抗氧化物。镁帮助肌肉放松防止抽筋，可可碱提升训练时的专注力。建议练前1h或练后作为小加餐。",
+    "conditions": ["post_workout", "rest_day"]
+  },
+
+  "userConfig": {
+    "selectedIngredients": [],
+    "isTrainingDay": true,
+    "trainingStart": "",
+    "trainingEnd": "",
+    "lockedMeals": {
+      "breakfast": null,
+      "lunch": null,
+      "dinner": null
+    },
+    "customIngredients": [],
+    "customRecipes": []
+  }
+}
