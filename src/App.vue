@@ -2,8 +2,11 @@
   <div class="app-container">
     <!-- 头部 -->
     <header class="app-header">
-      <h1 class="app-header__title">🏸 饮食决策</h1>
-      <p class="app-header__subtitle">练前补碳 · 练后补蛋白 · 转盘选餐不纠结</p>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
+        <img src="/favicon.jpg" alt="品牌Logo" style="width: 44px; height: 44px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+        <h1 class="app-header__title" style="margin: 0;">菜篮盲盒</h1>
+      </div>
+      <p class="app-header__subtitle" style="font-size: 0.9em; opacity: 0.85; margin-top: 4px;">练前‘加Buff’，练后‘爆神装’，转盘一响，好饭开箱。</p>
     </header>
 
     <!-- 训练计划设置 -->

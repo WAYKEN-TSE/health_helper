@@ -80,6 +80,35 @@
 <script setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { MEAL_LABELS, TAG_LABELS, TAG_COLORS, getIngredientById } from '../data/recipes.js'
+import confetti from 'canvas-confetti'
+
+const playUnboxSound = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = 'sine';
+    // Arpeggio for "opening" pattern
+    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.05); // E5
+    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.1); // G5
+    osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.15); // C6
+    
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.6);
+  } catch (e) {
+    console.warn("Audio not supported or permission denied", e);
+  }
+}
 
 const props = defineProps({
   slot: { type: String, required: true },
@@ -206,6 +235,22 @@ function onTransitionEnd(e) {
     isAnimating.value = false
     settlingState = false
     
+    playUnboxSound();
+    let originX = 0.5;
+    let originY = 0.5;
+    if (slotViewportRef.value) {
+      const rect = slotViewportRef.value.getBoundingClientRect();
+      originX = (rect.left + rect.width / 2) / window.innerWidth;
+      originY = (rect.top + rect.height / 2) / window.innerHeight;
+    }
+    confetti({
+      particleCount: 60,
+      spread: 50,
+      origin: { x: originX, y: originY },
+      colors: ['#26de81', '#fed330', '#fc5c65', '#45aaf2'],
+      zIndex: 100
+    });
+
     nextTick(() => {
       // 强制触发一次 reflow 以阻断旧的 transition
       void slotViewportRef.value.offsetHeight
@@ -256,6 +301,37 @@ defineExpose({ triggerSpin, reset, spinning })
 </script>
 
 <style scoped>
+.slot-viewport--spinning {
+  animation: slot-shake 0.4s infinite ease-in-out alternate;
+  box-shadow: 0 0 15px rgba(38, 222, 129, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.slot-viewport--spinning::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,0.8) 10%, transparent 10%),
+              radial-gradient(circle, rgba(255,255,255,0.8) 10%, transparent 10%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  animation: flash-particles 0.3s infinite linear;
+  opacity: 0.15;
+  z-index: 10;
+}
+
+@keyframes slot-shake {
+  0% { transform: translateY(-2px) scale(0.99); }
+  100% { transform: translateY(2px) scale(1.005); }
+}
+
+@keyframes flash-particles {
+  0% { background-position: 0 0, 10px 10px; }
+  100% { background-position: 0 50px, 10px 60px; }
+}
+
 .meal-slot {
   margin-bottom: var(--space-lg);
 }
