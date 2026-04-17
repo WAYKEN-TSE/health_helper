@@ -47,8 +47,11 @@
           :key="idx"
           class="slot-item"
         >
-          <span class="slot-item__name" :style="{ opacity: (!spinning && !currentRecipe) ? 0.3 : 1 }">
-            {{ item.name }}
+          <span 
+            class="slot-item__name" 
+            :style="(!spinning && !currentRecipe) ? { opacity: 0.6, letterSpacing: '2px', fontWeight: 'bold', color: 'var(--text-muted)' } : { opacity: 1 }"
+          >
+            {{ (!spinning && !currentRecipe) ? '？？？' : item.name }}
           </span>
         </div>
       </div>
