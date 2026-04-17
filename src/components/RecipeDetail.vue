@@ -56,13 +56,28 @@
         <!-- 烹饪步骤 -->
         <div class="detail-section">
           <h3 class="detail-section__title">👨‍🍳 烹饪步骤</h3>
-          <ol class="steps-list">
-            <li
-              v-for="(step, idx) in recipe.steps"
-              :key="idx"
-              class="steps-list__item"
-            >{{ step }}</li>
-          </ol>
+          
+          <template v-if="recipe.steps && recipe.steps.length > 0">
+            <ol class="steps-list">
+              <li
+                v-for="(step, idx) in recipe.steps"
+                :key="idx"
+                class="steps-list__item"
+              >{{ step }}</li>
+            </ol>
+          </template>
+          
+          <template v-else-if="recipe.custom_steps">
+            <div class="custom-steps-block">
+              {{ recipe.custom_steps }}
+            </div>
+          </template>
+          
+          <template v-else>
+            <div class="custom-steps-block empty-text">
+              详细做法：暂无
+            </div>
+          </template>
         </div>
 
         <!-- 运动员 Tips -->
@@ -205,5 +220,21 @@ function getIngredientName(id) {
   font-size: var(--font-xs);
   color: var(--accent-green);
   font-weight: 500;
+}
+
+.custom-steps-block {
+  font-size: var(--font-sm);
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  background: rgba(255, 255, 255, 0.05);
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+}
+
+.empty-text {
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
 }
 </style>

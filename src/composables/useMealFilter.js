@@ -4,7 +4,7 @@ import { computed } from 'vue'
  * MealFilter composable
  * 将过滤引擎包装为 Vue 响应式 API
  */
-export function useMealFilter(recipesData, selectedIds, isTrainingDay, trainingStart, trainingEnd) {
+export function useMealFilter(recipesData, selectedIds, forceEnabledRecipes, isTrainingDay, trainingStart, trainingEnd) {
 
   /** "HH:mm" → 当天分钟数 */
   function parseTime(str) {
@@ -62,7 +62,7 @@ export function useMealFilter(recipesData, selectedIds, isTrainingDay, trainingS
 
     return tagRecipes.filter(r =>
       r.suitableMeals.includes(slot) &&
-      r.ingredientIds.every(id => ids.has(id))
+      (r.ingredientIds.every(id => ids.has(id)) || forceEnabledRecipes.value?.includes(r.id))
     )
   }
 

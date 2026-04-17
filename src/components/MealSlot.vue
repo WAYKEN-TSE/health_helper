@@ -61,7 +61,8 @@
     <div
       v-if="currentRecipe && !spinning"
       class="result-area"
-      @click="$emit('show-detail', currentRecipe)"
+      :class="{ 'result-area--disabled': !hasDetail(currentRecipe) }"
+      @click="hasDetail(currentRecipe) ? $emit('show-detail', currentRecipe) : null"
     >
       <div class="result-area__portions">
         <span
@@ -69,8 +70,16 @@
           :key="ingId"
           class="result-area__portion-item"
         >{{ getIngredientName(ingId) }} {{ portion }}</span>
+        
+        <template v-if="!currentRecipe.portions || Object.keys(currentRecipe.portions).length === 0">
+          <span 
+            v-for="ingId in currentRecipe.ingredientIds" 
+            :key="ingId" 
+            class="result-area__portion-item"
+          >{{ getIngredientName(ingId) }}</span>
+        </template>
       </div>
-      <div class="result-area__hint">点击查看详细做法 →</div>
+      <div class="result-area__hint">{{ hasDetail(currentRecipe) ? '点击查看详细做法 →' : '详细做法：暂无' }}</div>
     </div>
 
     <!-- 空池提示 -->
@@ -167,6 +176,11 @@ function getDynamicItemHeight() {
     return reelElement.children[0].offsetHeight
   }
   return window.innerWidth >= 768 ? 100 : 90
+}
+
+function hasDetail(recipe) {
+  if (!recipe) return false
+  return (recipe.steps && recipe.steps.length > 0) || (recipe.custom_steps && recipe.custom_steps.trim().length > 0)
 }
 
 /**
@@ -368,6 +382,14 @@ defineExpose({ triggerSpin, reset, spinning })
 
 .slot-reel.is-settling {
   transition: transform 0.8s cubic-bezier(0.3, 0.05, 0.2, 1);
+}
+
+.result-area--disabled {
+  cursor: not-allowed !important;
+  opacity: 0.8;
+}
+.result-area--disabled .result-area__hint {
+  color: var(--text-muted);
 }
 
 .empty-hint {

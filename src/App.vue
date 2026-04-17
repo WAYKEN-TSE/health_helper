@@ -25,6 +25,17 @@
       v-model:deleted-ingredients="deletedIngredients"
     />
 
+    <!-- 菜谱管理 -->
+    <RecipePanel
+      :recipes-data="recipesData"
+      v-model:selectedIngredients="selectedIngredients"
+      v-model:forceEnabledRecipes="forceEnabledRecipes"
+      v-model:customRecipes="customRecipes"
+      v-model:deletedRecipes="deletedRecipes"
+      @open-create="showRecipeForm = true"
+      @show-detail="showRecipeDetail"
+    />
+
     <!-- 老虎机 -->
     <SlotMachine
       :pools="pools"
@@ -49,6 +60,16 @@
       :show="showSnack"
       @dismiss="showSnack = false"
     />
+
+    <!-- 新建菜谱弹窗 -->
+    <RecipeFormModal
+      :show="showRecipeForm"
+      :recipes-data="recipesData"
+      :custom-ingredients="customIngredients"
+      @close="showRecipeForm = false"
+      @save-recipe="handleSaveRecipe"
+      @create-ingredient="handleCreateIngredient"
+    />
   </div>
 </template>
 
@@ -59,6 +80,8 @@ import { useMealFilter } from './composables/useMealFilter.js'
 import { useStorage } from './composables/useStorage.js'
 import TrainingConfig from './components/TrainingConfig.vue'
 import IngredientPanel from './components/IngredientPanel.vue'
+import RecipePanel from './components/RecipePanel.vue'
+import RecipeFormModal from './components/RecipeFormModal.vue'
 import SlotMachine from './components/SlotMachine.vue'
 import RecipeDetail from './components/RecipeDetail.vue'
 import SnackAlert from './components/SnackAlert.vue'
@@ -72,6 +95,9 @@ const trainingStart = useStorage('trainingStart', '09:00')
 const trainingEnd = useStorage('trainingEnd', '11:00')
 const customIngredients = useStorage('customIngredients', [])
 const deletedIngredients = useStorage('deletedIngredients', [])
+const customRecipes = useStorage('customRecipes', [])
+const deletedRecipes = useStorage('deletedRecipes', [])
+const forceEnabledRecipes = useStorage('forceEnabledRecipes', [])
 
 // 默认全选所有食材
 const defaultSelectedIds = getAllIngredients(recipesData.value).map(i => i.id)
@@ -82,11 +108,13 @@ const lockedMeals = ref({ breakfast: false, lunch: false, dinner: false })
 const detailRecipe = ref(null)
 const showSnack = ref(false)
 const snackData = ref(null)
+const showRecipeForm = ref(false)
 
 // ── 过滤引擎 ──
 const { mealTags, pools, rollSnack } = useMealFilter(
   recipesData,
   selectedIngredients,
+  forceEnabledRecipes,
   isTrainingDay,
   trainingStart,
   trainingEnd
@@ -104,5 +132,13 @@ function handleAllDone() {
     snackData.value = result.data
     showSnack.value = true
   }
+}
+
+function handleSaveRecipe(recipe) {
+  customRecipes.value = [...customRecipes.value, recipe]
+}
+
+function handleCreateIngredient(ing) {
+  customIngredients.value = [...customIngredients.value, ing]
 }
 </script>
