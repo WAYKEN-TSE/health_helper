@@ -8,7 +8,7 @@
       </div>
       <div class="meal-header__actions">
         <button
-          v-if="currentRecipe && !spinning"
+          v-if="!spinning && pool.length > 0"
           class="btn btn--ghost btn--sm"
           :class="{ 'lock-active': locked }"
           @click="$emit('toggle-lock')"
