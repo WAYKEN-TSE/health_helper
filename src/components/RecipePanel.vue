@@ -10,8 +10,46 @@
     <div class="collapse-body" :class="isOpen ? 'collapse-body--open' : 'collapse-body--closed'">
       <div class="ingredient-content card" style="margin-top: var(--space-sm); border-top-left-radius: var(--radius-sm); border-top-right-radius: var(--radius-sm);">
 
-        <!-- 分类菜谱 -->
-        <div v-for="(recipes, category) in filteredCategorizedRecipes" :key="category" class="category-group">
+        <!-- 搜索栏 -->
+        <div class="search-bar-wrapper">
+          <span class="search-icon">🔍</span>
+          <input
+            v-model="searchQuery"
+            class="search-input"
+            placeholder="搜索你想吃的菜..."
+            type="text"
+          />
+          <button v-if="searchQuery" class="search-clear" @click="searchQuery = ''">✕</button>
+        </div>
+
+        <!-- 搜索结果平铺模式 -->
+        <div v-if="debouncedQuery" class="search-results">
+          <div v-if="flatSearchResults.length === 0" class="search-empty">未找到匹配「{{ debouncedQuery }}」的菜谱</div>
+          <div v-else class="recipe-grid">
+            <div
+              v-for="item in flatSearchResults"
+              :key="item.id"
+              class="recipe-card"
+              :class="{
+                'recipe-card--disabled': !isAvailable(item),
+                'recipe-card--natural': isAvailable(item),
+                'recipe-card--selected': isSelected(item)
+              }"
+              @click="handleRecipeClick(item._category, item)"
+            >
+              <div class="recipe-card__header">
+                <span class="recipe-card__name">{{ item.name }}</span>
+                <span class="selection-indicator">
+                  <span class="checkbox-box">{{ isSelected(item) ? '★' : '☆' }}</span>
+                </span>
+              </div>
+              <span class="search-cat-badge">{{ item._category }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 分类菜谱（非搜索模式） -->
+        <div v-for="(recipes, category) in filteredCategorizedRecipes" v-show="!debouncedQuery" :key="category" class="category-group">
           <!-- 分类标题栏操作区 -->
           <div class="category-header">
             <div class="header-left-group">
@@ -43,9 +81,9 @@
 
             <!-- 分类级批量操作 -->
             <div class="category-bulk-actions">
-              <button class="link-btn" @click="selectCategoryAll(category, recipes)" :title="activeDeleteCategory === category ? '全选批量删除' : '打破库存限制全部激活'">全选</button>
+              <button class="link-btn" @click="selectCategoryAll(category, recipes)" :title="activeDeleteCategory === category ? '全选批量删除' : '一键加入心愿单（强制备选）'">全选</button>
               <span class="divider"></span>
-              <button class="link-btn" @click="selectCategoryNone(category, recipes)">全不选</button>
+              <button class="link-btn" @click="selectCategoryNone(category, recipes)" :title="activeDeleteCategory === category ? '取消全选删除' : '一键移出心愿单'">全不选</button>
             </div>
           </div>
 
@@ -55,9 +93,9 @@
               :key="recipe.id"
               class="recipe-card"
               :class="{
-                'recipe-card--disabled': !isNaturallyMatched(recipe) && !isForceMatched(recipe),
-                'recipe-card--force': !isNaturallyMatched(recipe) && isForceMatched(recipe),
-                'recipe-card--natural': isNaturallyMatched(recipe),
+                'recipe-card--disabled': !isAvailable(recipe),
+                'recipe-card--natural': isAvailable(recipe),
+                'recipe-card--selected': isSelected(recipe),
                 'recipe-card--delete-mode': activeDeleteCategory === category,
                 'recipe-card--to-delete': itemsToDelete.includes(recipe.id)
               }"
@@ -68,8 +106,9 @@
                 <span v-if="activeDeleteCategory === category" class="delete-checkbox">
                   {{ itemsToDelete.includes(recipe.id) ? '☑' : '☐' }}
                 </span>
-                <span v-else-if="isNaturallyMatched(recipe)" class="badge badge--green badge--small">可制作</span>
-                <span v-else-if="isForceMatched(recipe)" class="badge badge--amber badge--small">需采购</span>
+                <span v-else class="selection-indicator">
+                  <span class="checkbox-box">{{ isSelected(recipe) ? '★' : '☆' }}</span>
+                </span>
               </div>
             </div>
           </div>
@@ -80,8 +119,11 @@
     <!-- 缺品补充弹窗 Bottom Sheet -->
     <div v-if="activeMissingRecipe" class="modal-overlay" @click="closeMissingSheet">
       <div class="bottom-sheet" @click.stop>
-        <h3>缺少关键食材</h3>
-        <p class="sheet-desc">点击下方食材快捷加入库存，此菜谱即转为可用状态：</p>
+        <div class="sheet-header">
+          <h3>缺少关键食材</h3>
+          <button class="btn-batch-replenish" @click="batchReplenish">⚡ 一键补齐缺料</button>
+        </div>
+        <p class="sheet-desc">点击下方食材逐个加入库存，或直接点击右上角一键补齐：</p>
         <div class="missing-ingredients">
           <button 
             v-for="ing in missingIngredientsData" 
@@ -111,22 +153,45 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { getIngredientById } from '../data/recipes.js'
 
 const props = defineProps({
   recipesData: Object,
   selectedIngredients: Array,
-  forceEnabledRecipes: Array,
+  selectedRecipes: Array,
   customRecipes: Array,
   deletedRecipes: Array
 })
 
-const emit = defineEmits(['update:selectedIngredients', 'update:forceEnabledRecipes', 'update:deletedRecipes', 'open-create', 'show-detail'])
+const emit = defineEmits(['update:selectedIngredients', 'update:selectedRecipes', 'update:deletedRecipes', 'open-create', 'show-detail'])
 
 const isOpen = ref(false)
 const activeDeleteCategory = ref(null)
 const itemsToDelete = ref([])
+
+// 搜索防抖
+const searchQuery = ref('')
+const debouncedQuery = ref('')
+let _debounceTimer = null
+watch(searchQuery, (val) => {
+  clearTimeout(_debounceTimer)
+  _debounceTimer = setTimeout(() => { debouncedQuery.value = val.trim() }, 300)
+})
+
+const flatSearchResults = computed(() => {
+  const q = debouncedQuery.value.toLowerCase()
+  if (!q) return []
+  const results = []
+  for (const [category, recipes] of Object.entries(categorizedRecipes.value)) {
+    for (const r of recipes) {
+      if (r.name.toLowerCase().includes(q)) {
+        results.push({ ...r, _category: category })
+      }
+    }
+  }
+  return results
+})
 
 const activeMissingRecipe = ref(null)
 const missingIngredientsData = ref([])
@@ -148,8 +213,8 @@ const categorizedRecipes = computed(() => {
   const deletedSet = new Set(props.deletedRecipes || [])
   const allList = []
   
-  if (props.recipesData && props.recipesData.recipes) {
-    Object.values(props.recipesData.recipes).forEach(arr => allList.push(...arr))
+  if (props.recipesData && Array.isArray(props.recipesData.recipes)) {
+    allList.push(...props.recipesData.recipes)
   }
   if (props.customRecipes) {
     allList.push(...props.customRecipes)
@@ -204,27 +269,41 @@ function hideTooltip() {
   tooltipState.value.visible = false
 }
 
-function isNaturallyMatched(recipe) {
+function isAvailable(recipe) {
   if (!recipe || !recipe.ingredientIds) return false
   const selectedSet = new Set(props.selectedIngredients)
   return recipe.ingredientIds.every(id => selectedSet.has(id))
 }
 
-function isForceMatched(recipe) {
+function isSelected(recipe) {
   if (!recipe) return false
-  return (props.forceEnabledRecipes || []).includes(recipe.id)
+  return (props.selectedRecipes || []).includes(recipe.id)
 }
 
-function forceEnableCategory(category, recipes) {
+function selectRecipe(recipe) {
+  const next = [...new Set([...(props.selectedRecipes || []), recipe.id])]
+  emit('update:selectedRecipes', next)
+}
+
+function toggleSelection(recipe) {
+  const current = props.selectedRecipes || []
+  if (current.includes(recipe.id)) {
+    emit('update:selectedRecipes', current.filter(id => id !== recipe.id))
+  } else {
+    emit('update:selectedRecipes', [...current, recipe.id])
+  }
+}
+
+function forceSelectCategory(category, recipes) {
   const ids = recipes.map(r => r.id)
-  const next = [...new Set([...(props.forceEnabledRecipes || []), ...ids])]
-  emit('update:forceEnabledRecipes', next)
+  const next = [...new Set([...(props.selectedRecipes || []), ...ids])]
+  emit('update:selectedRecipes', next)
 }
 
-function forceDisableCategory(category, recipes) {
+function forceUnselectCategory(category, recipes) {
   const idsToRemove = new Set(recipes.map(r => r.id))
-  const next = (props.forceEnabledRecipes || []).filter(id => !idsToRemove.has(id))
-  emit('update:forceEnabledRecipes', next)
+  const next = (props.selectedRecipes || []).filter(id => !idsToRemove.has(id))
+  emit('update:selectedRecipes', next)
 }
 
 function selectCategoryAll(category, recipes) {
@@ -232,8 +311,7 @@ function selectCategoryAll(category, recipes) {
     const ids = recipes.map(i => i.id)
     itemsToDelete.value = [...new Set([...itemsToDelete.value, ...ids])]
   } else {
-    // Break inventory limit for these recipes
-    forceEnableCategory(category, recipes)
+    forceSelectCategory(category, recipes)
   }
 }
 
@@ -241,7 +319,7 @@ function selectCategoryNone(category, recipes) {
   if (activeDeleteCategory.value === category) {
     itemsToDelete.value = []
   } else {
-    forceDisableCategory(category, recipes)
+    forceUnselectCategory(category, recipes)
   }
 }
 
@@ -275,11 +353,11 @@ function handleRecipeClick(category, recipe) {
     return
   }
 
-  // 正常模式
-  if (isNaturallyMatched(recipe) || isForceMatched(recipe)) {
-    emit('show-detail', recipe)
+  // 正常模式解耦
+  if (isAvailable(recipe)) {
+    toggleSelection(recipe)
   } else {
-    // 呼出补齐缺品弹窗
+    // 呼叫缺品弹窗
     const missingIds = recipe.ingredientIds.filter(id => !props.selectedIngredients.includes(id))
     missingIngredientsData.value = missingIds.map(id => getIngredientById(props.recipesData, id) || { id, name: id })
     activeMissingRecipe.value = recipe
@@ -291,7 +369,11 @@ function replenishIngredient(ing) {
   missingIngredientsData.value = missingIngredientsData.value.filter(i => i.id !== ing.id)
   
   if (missingIngredientsData.value.length === 0) {
+    const recipe = activeMissingRecipe.value
     activeMissingRecipe.value = null // all fulfilled
+    if (recipe) {
+      selectRecipe(recipe)
+    }
   }
 }
 
@@ -299,9 +381,84 @@ function closeMissingSheet() {
   activeMissingRecipe.value = null
   missingIngredientsData.value = []
 }
+
+function batchReplenish() {
+  // 1. 一次性吸纳所有缺少的食材入库
+  const missingIds = missingIngredientsData.value.map(i => i.id)
+  emit('update:selectedIngredients', [...new Set([...props.selectedIngredients, ...missingIds])])
+
+  // 2. 补齐后直接将菜谱标记为主观选定
+  const targetRecipe = activeMissingRecipe.value
+  if (targetRecipe) {
+    const current = props.selectedRecipes || []
+    emit('update:selectedRecipes', [...new Set([...current, targetRecipe.id])])
+  }
+
+  // 3. 销毁实例
+  closeMissingSheet()
+}
 </script>
 
 <style scoped>
+/* 搜索栏 */
+.search-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.search-icon { font-size: 14px; flex-shrink: 0; }
+.search-input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text); font-size: var(--font-sm);
+}
+.search-input::placeholder { color: var(--text-muted); }
+.search-clear {
+  background: none; border: none; color: var(--text-muted);
+  cursor: pointer; font-size: 14px; padding: 0 2px; transition: color 0.2s;
+}
+.search-clear:hover { color: var(--text); }
+.search-results { margin-bottom: var(--space-md); }
+.search-empty {
+  text-align: center; color: var(--text-muted);
+  font-size: var(--font-sm); padding: var(--space-lg) 0;
+}
+.search-cat-badge {
+  font-size: 10px; color: var(--text-muted);
+  background: rgba(255,255,255,0.06);
+  padding: 1px 6px; border-radius: 8px;
+  align-self: flex-start; margin-top: 2px;
+}
+
+/* Bottom Sheet Header */
+.sheet-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.btn-batch-replenish {
+  background: var(--accent-green);
+  color: #0a0f1a;
+  border: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-batch-replenish:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 2px 8px rgba(45, 212, 160, 0.4);
+}
+
 .category-group { margin-bottom: var(--space-md); }
 
 .category-header {
@@ -439,7 +596,10 @@ function closeMissingSheet() {
 }
 
 .recipe-card--natural { border-color: hsla(161, 65%, 50%, 0.3); }
-.recipe-card--force { border-color: hsla(38, 90%, 55%, 0.3); }
+.recipe-card--selected { 
+  border-color: hsla(38, 90%, 55%, 0.6); 
+  background: hsla(38, 90%, 55%, 0.1);
+}
 
 .recipe-card--disabled {
   opacity: 0.5;
@@ -478,6 +638,13 @@ function closeMissingSheet() {
   padding: 2px 4px;
   font-size: 10px;
   align-self: flex-start;
+}
+
+.selection-indicator {
+  align-self: flex-end;
+  font-size: 16px;
+  color: hsla(38, 90%, 55%, 0.9);
+  line-height: 1;
 }
 
 .delete-checkbox {

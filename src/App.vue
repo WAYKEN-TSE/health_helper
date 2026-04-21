@@ -29,7 +29,7 @@
     <RecipePanel
       :recipes-data="recipesData"
       v-model:selectedIngredients="selectedIngredients"
-      v-model:forceEnabledRecipes="forceEnabledRecipes"
+      v-model:selectedRecipes="selectedRecipes"
       v-model:customRecipes="customRecipes"
       v-model:deletedRecipes="deletedRecipes"
       @open-create="showRecipeForm = true"
@@ -97,7 +97,7 @@ const customIngredients = useStorage('customIngredients', [])
 const deletedIngredients = useStorage('deletedIngredients', [])
 const customRecipes = useStorage('customRecipes', [])
 const deletedRecipes = useStorage('deletedRecipes', [])
-const forceEnabledRecipes = useStorage('forceEnabledRecipes', [])
+const selectedRecipes = useStorage('selectedRecipes', [])
 
 // 默认全选所有食材
 const defaultSelectedIds = getAllIngredients(recipesData.value).map(i => i.id)
@@ -114,7 +114,7 @@ const showRecipeForm = ref(false)
 const { mealTags, pools, rollSnack } = useMealFilter(
   recipesData,
   selectedIngredients,
-  forceEnabledRecipes,
+  selectedRecipes,
   isTrainingDay,
   trainingStart,
   trainingEnd

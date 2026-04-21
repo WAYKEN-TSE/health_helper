@@ -22,7 +22,7 @@
       <button
         class="btn btn--spin btn--full"
         @click="spinAll"
-        :disabled="allSpinning || totalPoolSize === 0"
+        :disabled="allSpinning"
       >
         {{ allSpinning ? '🎰 抽取中...' : '🎰 一键随机' }}
       </button>
@@ -75,6 +75,17 @@ function handleResult(slot, recipe) {
 }
 
 function spinAll() {
+  const activeSlots = slots.filter(s => !props.lockedMeals[s]);
+  if (activeSlots.length === 0) return;
+
+  const emptySlots = activeSlots.filter(s => !props.pools[s] || props.pools[s].length === 0);
+  
+  if (emptySlots.length > 0) {
+    // 物理拦截：如存在空池则整体拦截并提示
+    alert("当前没有可制作的菜谱，请在「食材管理」录入库存，或手动勾选想吃的菜品。");
+    return;
+  }
+
   slots.forEach((s, i) => {
     if (!props.lockedMeals[s] && slotRefs.value[s]) {
       // 错开启动时间

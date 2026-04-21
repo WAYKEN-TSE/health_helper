@@ -47,11 +47,17 @@
         </label>
 
         <label class="form-group">
-          <span>战术标签 <span class="required">*</span> <span class="hint">(影响其落入哪个大池)</span></span>
-          <div class="radio-group">
-            <label><input type="radio" v-model="form.mealTag" value="pre_workout"> 练前餐</label>
-            <label><input type="radio" v-model="form.mealTag" value="post_workout"> 练后餐</label>
-            <label><input type="radio" v-model="form.mealTag" value="rest_day"> 日常餐</label>
+          <span>战术标签 <span class="required">*</span> <span class="hint">(影响其落入哪个大池，可多选)</span></span>
+          <div class="pill-group">
+            <label :class="{ 'pill--active': form.mealTag.includes('pre_workout') }">
+              <input type="checkbox" v-model="form.mealTag" value="pre_workout"> 练前餐
+            </label>
+            <label :class="{ 'pill--active': form.mealTag.includes('post_workout') }">
+              <input type="checkbox" v-model="form.mealTag" value="post_workout"> 练后餐
+            </label>
+            <label :class="{ 'pill--active': form.mealTag.includes('rest_day') }">
+              <input type="checkbox" v-model="form.mealTag" value="rest_day"> 日常餐
+            </label>
           </div>
         </label>
 
@@ -99,7 +105,7 @@ const categoryEmoji = {
 const form = ref({
   name: '',
   ingredientIds: [],
-  mealTag: '',
+  mealTag: [],
   recipeCategory: '',
   custom_steps: ''
 })
@@ -173,8 +179,8 @@ function saveForm() {
     errorMsg.value = '必须关联至少一种食材'
     return
   }
-  if (!form.value.mealTag) {
-    errorMsg.value = '必须选择战术标签'
+  if (!form.value.mealTag || form.value.mealTag.length === 0) {
+    errorMsg.value = '必须至少选择一个战术标签'
     return
   }
   if (!form.value.recipeCategory) {
@@ -187,12 +193,13 @@ function saveForm() {
     name: form.value.name.trim(),
     mealTag: form.value.mealTag,
     recipeCategory: form.value.recipeCategory,
-    // By default map it to whatever suits the tag logically (for slot generation)
-    // Actually the mealFilter usually checks `suitableMeals.includes(slot)`
-    // So we must assign suitableMeals based on mealTag
-    suitableMeals: form.value.mealTag === 'post_workout' ? ['lunch', 'dinner'] : 
-                   form.value.mealTag === 'pre_workout' ? ['breakfast', 'lunch'] : 
-                   ['breakfast', 'lunch', 'dinner'],
+    // 合并多选战术标签的所有适用餐次并去重
+    suitableMeals: Array.from(new Set(form.value.mealTag.flatMap(tag => {
+      if (tag === 'post_workout') return ['lunch', 'dinner'];
+      if (tag === 'pre_workout') return ['breakfast', 'lunch'];
+      if (tag === 'rest_day') return ['breakfast', 'lunch', 'dinner'];
+      return [];
+    }))),
     ingredientIds: [...form.value.ingredientIds],
     custom_steps: form.value.custom_steps.trim(),
     portions: {},
@@ -206,7 +213,7 @@ function saveForm() {
 // Reset form when opened
 watch(() => props.show, (val) => {
   if (val) {
-    form.value = { name: '', ingredientIds: [], mealTag: '', recipeCategory: '', custom_steps: '' }
+    form.value = { name: '', ingredientIds: [], mealTag: [], recipeCategory: '', custom_steps: '' }
     searchInput.value = ''
     errorMsg.value = ''
   }
@@ -290,17 +297,35 @@ watch(() => props.show, (val) => {
   background-size: 16px;
 }
 
-.radio-group {
-  display: flex; gap: 16px;
+.pill-group {
+  display: flex; gap: 12px; flex-wrap: wrap;
 }
-.radio-group label {
-  display: flex; align-items: center; gap: 4px; font-size: var(--font-sm); cursor: pointer;
+.pill-group label {
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
 }
-.radio-group input[type="radio"] { accent-color: var(--accent-green); }
+.pill-group input[type="checkbox"] {
+  display: none; /* 隐藏原生勾选框 */
+}
+.pill-group label.pill--active {
+  background: rgba(38, 222, 129, 0.15);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  font-weight: 500;
+}
 
 .ingredient-search-wrapper {
   position: relative;
   display: flex; flex-direction: column; gap: 8px;
+  z-index: 50; /* 强化层级上下文 */
 }
 
 .selected-tags {
@@ -325,12 +350,12 @@ watch(() => props.show, (val) => {
   position: absolute;
   top: 100%; left: 0; right: 0;
   margin-top: 4px;
-  background: var(--surface-light);
+  background: #1e1e1e; /* 纯不透明背景色，防字体透视 */
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   max-height: 150px; overflow-y: auto;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 51;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.8); /* 强化物理覆盖黑阴影 */
 }
 
 .search-item {

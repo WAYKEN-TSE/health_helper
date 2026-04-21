@@ -9,14 +9,47 @@
     <!-- 折叠内容 -->
     <div class="collapse-body" :class="isOpen ? 'collapse-body--open' : 'collapse-body--closed'">
       <div class="ingredient-content card" style="margin-top: var(--space-sm); border-top-left-radius: var(--radius-sm); border-top-right-radius: var(--radius-sm);">
+        <!-- 搜索栏 -->
+        <div class="search-bar-wrapper">
+          <span class="search-icon">🔍</span>
+          <input
+            v-model="searchQuery"
+            class="search-input"
+            placeholder="搜索食材..."
+            type="text"
+          />
+          <button v-if="searchQuery" class="search-clear" @click="searchQuery = ''">✕</button>
+        </div>
+
         <!-- 全选/全不选 -->
-        <div class="bulk-actions">
+        <div v-if="!debouncedQuery" class="bulk-actions">
           <button class="btn btn--ghost btn--sm" @click="selectAll">✅ 全选</button>
           <button class="btn btn--ghost btn--sm" @click="selectNone">❌ 全不选</button>
         </div>
 
-        <!-- 分类食材 -->
-        <div v-for="(items, category) in categorizedIngredients" :key="category" class="category-group">
+        <!-- 搜索结果平铺模式 -->
+        <div v-if="debouncedQuery" class="search-results">
+          <div v-if="flatSearchResults.length === 0" class="search-empty">未找到匹配「{{ debouncedQuery }}」的食材</div>
+          <div v-else class="ingredient-grid">
+            <label
+              v-for="item in flatSearchResults"
+              :key="item.id"
+              class="checkbox"
+              :class="{ 'checkbox--custom': item.isCustom }"
+            >
+              <input
+                type="checkbox"
+                :checked="selected.includes(item.id)"
+                @change="toggleItem(item.id)"
+              />
+              <span class="checkbox__label">{{ item.name }}</span>
+              <span class="search-cat-badge">{{ item._category }}</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 分类食材（非搜索模式） -->
+        <div v-for="(items, category) in categorizedIngredients" v-show="!debouncedQuery" :key="category" class="category-group">
           <!-- 分类标题栏重构为操作区 -->
           <div class="category-header">
             <div class="header-left-group">
@@ -85,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, watch } from 'vue'
 import { getIngredientsByCategory, getAllIngredients } from '../data/recipes.js'
 
 const props = defineProps({
@@ -105,6 +138,29 @@ const toastMsg = ref('')
 
 const activeDeleteCategory = ref(null)
 const itemsToDelete = ref([])
+
+// 搜索防抖
+const searchQuery = ref('')
+const debouncedQuery = ref('')
+let _debounceTimer = null
+watch(searchQuery, (val) => {
+  clearTimeout(_debounceTimer)
+  _debounceTimer = setTimeout(() => { debouncedQuery.value = val.trim() }, 300)
+})
+
+const flatSearchResults = computed(() => {
+  const q = debouncedQuery.value.toLowerCase()
+  if (!q) return []
+  const results = []
+  for (const [category, items] of Object.entries(categorizedIngredients.value)) {
+    for (const item of items) {
+      if (item.name.toLowerCase().includes(q)) {
+        results.push({ ...item, _category: category })
+      }
+    }
+  }
+  return results
+})
 
 const categoryEmoji = {
   碳水: '🍚',
@@ -328,6 +384,67 @@ function handleCheckboxChange(category, id) {
 </script>
 
 <style scoped>
+/* 搜索栏 */
+.search-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.search-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: var(--font-sm);
+}
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+.search-clear {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  transition: color 0.2s;
+}
+.search-clear:hover {
+  color: var(--text);
+}
+.search-results {
+  margin-bottom: var(--space-md);
+}
+.search-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  padding: var(--space-lg) 0;
+}
+.search-cat-badge {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.06);
+  padding: 1px 6px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .bulk-actions {
   display: flex;
   gap: var(--space-sm);

@@ -4,7 +4,7 @@ import { computed } from 'vue'
  * MealFilter composable
  * 将过滤引擎包装为 Vue 响应式 API
  */
-export function useMealFilter(recipesData, selectedIds, forceEnabledRecipes, isTrainingDay, trainingStart, trainingEnd) {
+export function useMealFilter(recipesData, selectedIds, selectedRecipes, isTrainingDay, trainingStart, trainingEnd) {
 
   /** "HH:mm" → 当天分钟数 */
   function parseTime(str) {
@@ -57,12 +57,24 @@ export function useMealFilter(recipesData, selectedIds, forceEnabledRecipes, isT
     if (!data || !data.recipes) return []
 
     const tag = getMealTag(slot)
-    const tagRecipes = data.recipes[tag] || []
+    const allRecipes = data.recipes || []
+    const tagRecipes = allRecipes.filter(r => r.mealTag.includes(tag))
     const ids = new Set(selectedIds.value)
 
+    // 第一优先级：检查属于当前餐次的主观勾选菜谱
+    const manuallySelected = tagRecipes.filter(r =>
+      r.suitableMeals.includes(slot) &&
+      selectedRecipes.value?.includes(r.id)
+    )
+
+    if (manuallySelected.length > 0) {
+      return manuallySelected
+    }
+
+    // 第二优先级：智能降级，选取当前餐次下所有客观满足条件（isAvailable）的菜谱
     return tagRecipes.filter(r =>
       r.suitableMeals.includes(slot) &&
-      (r.ingredientIds.every(id => ids.has(id)) || forceEnabledRecipes.value?.includes(r.id))
+      r.ingredientIds.every(id => ids.has(id))
     )
   }
 

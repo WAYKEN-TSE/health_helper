@@ -287,6 +287,16 @@ function triggerSpin() {
   startSpin()
 }
 
+function handleViewportClick() {
+  if (props.locked || spinning.value) return
+  if (props.pool.length === 0) {
+    // 物理拦截
+    alert("当前没有可制作的菜谱，请在「食材管理」录入库存，或手动勾选想吃的菜品。");
+    return;
+  }
+  startSpin()
+}
+
 function reset() {
   spinning.value = false
   isAnimating.value = false
