@@ -68,10 +68,33 @@
             <span class="metric-card__value" :style="{ color: metrics.bmiColor }">{{ metrics.bmi }}</span>
             <span class="metric-card__label">BMI · {{ metrics.bmiLevel }}</span>
           </div>
-          <div class="metric-card">
-            <span class="metric-card__value">{{ metrics.tdee }}</span>
-            <span class="metric-card__label">每日热量 kcal</span>
+
+          <!-- 每日热量：可自定义编辑 -->
+          <div
+            class="metric-card metric-card--editable"
+            :class="{ 'metric-card--custom': metrics.isCustomCalories }"
+            @click="startEditCalories"
+          >
+            <div v-if="!editingCalories" class="metric-card__value-row">
+              <span class="metric-card__value">{{ metrics.tdee }}</span>
+              <span class="metric-card__edit-icon">✏️</span>
+            </div>
+            <input
+              v-else
+              ref="calInputRef"
+              type="number" inputmode="numeric" min="0" max="10000"
+              class="metric-card__input"
+              :value="metrics.tdee"
+              @blur="commitCalories"
+              @keyup.enter="commitCalories"
+              @keyup.esc="editingCalories = false"
+              @click.stop
+            />
+            <span class="metric-card__label">
+              每日热量 kcal{{ metrics.isCustomCalories ? ' · 自定义' : '' }}
+            </span>
           </div>
+
           <div class="metric-card">
             <span class="metric-card__value">{{ metrics.bmr }}</span>
             <span class="metric-card__label">基础代谢 kcal</span>
@@ -97,7 +120,13 @@
         </div>
 
         <p class="metrics-hint">
-          按{{ metrics.isTrainingDay ? '训练日' : '休息日' }}活动量估算的每日建议摄入，供配餐参考
+          <template v-if="metrics.isCustomCalories">
+            已采用自定义热量，营养素随之换算 ·
+            <button class="metrics-hint__reset" @click="resetCalories">恢复推荐值 {{ metrics.tdeeAuto }}</button>
+          </template>
+          <template v-else>
+            按{{ metrics.isTrainingDay ? '训练日' : '休息日' }}活动量估算，点击热量数值可自定义
+          </template>
         </p>
       </div>
 
@@ -107,15 +136,45 @@
 </template>
 
 <script setup>
+import { ref, nextTick } from 'vue'
+
 const props = defineProps({
   profile: { type: Object, required: true },
-  metrics: { type: Object, default: null }
+  metrics: { type: Object, default: null },
+  customCalories: { type: [Number, String], default: '' }
 })
 
-const emit = defineEmits(['update:profile'])
+const emit = defineEmits(['update:profile', 'update:customCalories'])
 
 function update(key, value) {
   emit('update:profile', { ...props.profile, [key]: value })
+}
+
+// ── 每日热量自定义编辑 ──
+const editingCalories = ref(false)
+const calInputRef = ref(null)
+
+async function startEditCalories() {
+  editingCalories.value = true
+  await nextTick()
+  const el = calInputRef.value
+  if (el) { el.focus(); el.select() }
+}
+
+function commitCalories() {
+  if (!editingCalories.value) return
+  const val = Math.round(Number(calInputRef.value?.value))
+  editingCalories.value = false
+  if (val > 0) {
+    emit('update:customCalories', val)
+  } else {
+    // 输入空/非法 → 视为恢复推荐值
+    emit('update:customCalories', '')
+  }
+}
+
+function resetCalories() {
+  emit('update:customCalories', '')
 }
 </script>
 
@@ -223,6 +282,58 @@ function update(key, value) {
   text-align: center;
 }
 
+/* 可编辑热量卡片 */
+.metric-card--editable {
+  cursor: pointer;
+  transition: background var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+.metric-card--editable:hover {
+  background: var(--bg-surface-hover);
+}
+
+.metric-card--custom {
+  box-shadow: inset 0 0 0 1px var(--accent-amber);
+}
+
+.metric-card--custom .metric-card__value {
+  color: var(--accent-amber);
+}
+
+.metric-card__value-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.2;
+}
+
+.metric-card__edit-icon {
+  font-size: 9px;
+  opacity: 0.6;
+}
+
+.metric-card__input {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--accent-green);
+  outline: none;
+  color: var(--accent-green);
+  font-size: var(--font-lg);
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.2;
+  -moz-appearance: textfield;
+  padding: 0;
+}
+
+.metric-card__input::-webkit-outer-spin-button,
+.metric-card__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .macro-row {
   display: flex;
   gap: var(--space-sm);
@@ -263,6 +374,16 @@ function update(key, value) {
   color: var(--text-muted);
   text-align: center;
   margin-top: var(--space-sm);
+}
+
+.metrics-hint__reset {
+  background: none;
+  border: none;
+  color: var(--accent-green);
+  font-size: var(--font-xs);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
 }
 
 .metrics-empty {

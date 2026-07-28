@@ -13,8 +13,11 @@ import { computed } from 'vue'
  *  - 蛋白质    = 1.8 g/kg 体重（运动员区间 1.6~2.2 取中值）
  *  - 脂肪      = 占总热量 25%
  *  - 碳水      = 剩余热量换算
+ *
+ * 每日热量支持用户自定义覆盖：传入 customCalories(ref) 且 > 0 时，
+ * 以其为准重新拆解三大营养素（蛋白质按体重恒定，脂肪/碳水随热量变化）。
  */
-export function useNutrition(userProfile, isTrainingDay) {
+export function useNutrition(userProfile, isTrainingDay, customCalories) {
 
   /** BMI 中国成人标准分级 */
   function classifyBMI(bmi) {
@@ -48,9 +51,14 @@ export function useNutrition(userProfile, isTrainingDay) {
 
     // ── TDEE ──
     const activityFactor = isTrainingDay.value ? 1.725 : 1.375
-    const tdee = bmr * activityFactor
+    const tdeeAuto = bmr * activityFactor
 
-    // ── 三大营养素 ──
+    // ── 每日热量：优先采用用户自定义值 ──
+    const custom = Number(customCalories?.value)
+    const isCustom = custom > 0
+    const tdee = isCustom ? custom : tdeeAuto
+
+    // ── 三大营养素（按实际生效热量拆解）──
     const proteinG = weight * 1.8
     const fatG = (tdee * 0.25) / 9
     const carbG = Math.max(0, (tdee - proteinG * 4 - fatG * 9) / 4)
@@ -62,6 +70,8 @@ export function useNutrition(userProfile, isTrainingDay) {
       bmiColor,
       bmr: Math.round(bmr),
       tdee: Math.round(tdee),
+      tdeeAuto: Math.round(tdeeAuto),
+      isCustomCalories: isCustom,
       protein: Math.round(proteinG),
       fat: Math.round(fatG),
       carbs: Math.round(carbG),

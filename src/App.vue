@@ -10,7 +10,11 @@
     </header>
 
     <!-- 个人信息 -->
-    <UserProfile v-model:profile="userProfile" :metrics="nutritionMetrics" />
+    <UserProfile
+      v-model:profile="userProfile"
+      v-model:custom-calories="customCalories"
+      :metrics="nutritionMetrics"
+    />
 
     <!-- 训练计划设置 -->
     <TrainingConfig
@@ -99,6 +103,7 @@ const isTrainingDay = useStorage('isTrainingDay', true)
 const trainingStart = useStorage('trainingStart', '09:00')
 const trainingEnd = useStorage('trainingEnd', '11:00')
 const userProfile = useStorage('userProfile', { age: '', height: '', weight: '', gender: 'male' })
+const customCalories = useStorage('customCalories', '')
 const customIngredients = useStorage('customIngredients', [])
 const deletedIngredients = useStorage('deletedIngredients', [])
 const customRecipes = useStorage('customRecipes', [])
@@ -127,7 +132,7 @@ const { mealTags, pools, rollSnack } = useMealFilter(
 )
 
 // ── 营养目标引擎 ──
-const { metrics: nutritionMetrics } = useNutrition(userProfile, isTrainingDay)
+const { metrics: nutritionMetrics } = useNutrition(userProfile, isTrainingDay, customCalories)
 
 // ── 事件处理 ──
 function showRecipeDetail(recipe) {
