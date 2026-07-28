@@ -9,6 +9,9 @@
       <p class="app-header__subtitle" style="font-size: 0.9em; opacity: 0.85; margin-top: 4px;">练前‘加Buff’，练后‘爆神装’，转盘一响，好饭开箱。</p>
     </header>
 
+    <!-- 个人信息 -->
+    <UserProfile v-model:profile="userProfile" :metrics="nutritionMetrics" />
+
     <!-- 训练计划设置 -->
     <TrainingConfig
       v-model:is-training-day="isTrainingDay"
@@ -77,8 +80,10 @@
 import { ref, computed } from 'vue'
 import { getRecipesData, getAllIngredients } from './data/recipes.js'
 import { useMealFilter } from './composables/useMealFilter.js'
+import { useNutrition } from './composables/useNutrition.js'
 import { useStorage } from './composables/useStorage.js'
 import TrainingConfig from './components/TrainingConfig.vue'
+import UserProfile from './components/UserProfile.vue'
 import IngredientPanel from './components/IngredientPanel.vue'
 import RecipePanel from './components/RecipePanel.vue'
 import RecipeFormModal from './components/RecipeFormModal.vue'
@@ -93,6 +98,7 @@ const recipesData = ref(getRecipesData())
 const isTrainingDay = useStorage('isTrainingDay', true)
 const trainingStart = useStorage('trainingStart', '09:00')
 const trainingEnd = useStorage('trainingEnd', '11:00')
+const userProfile = useStorage('userProfile', { age: '', height: '', weight: '', gender: 'male' })
 const customIngredients = useStorage('customIngredients', [])
 const deletedIngredients = useStorage('deletedIngredients', [])
 const customRecipes = useStorage('customRecipes', [])
@@ -119,6 +125,9 @@ const { mealTags, pools, rollSnack } = useMealFilter(
   trainingStart,
   trainingEnd
 )
+
+// ── 营养目标引擎 ──
+const { metrics: nutritionMetrics } = useNutrition(userProfile, isTrainingDay)
 
 // ── 事件处理 ──
 function showRecipeDetail(recipe) {
